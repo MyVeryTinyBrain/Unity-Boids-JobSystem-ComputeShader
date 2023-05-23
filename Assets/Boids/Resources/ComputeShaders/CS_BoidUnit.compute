@@ -1,0 +1,110 @@
+#pragma kernel Execute
+
+#pragma multi_compile __ DIRECTIONAL_FORCER
+#pragma multi_compile __ POINT_FORCER
+#pragma multi_compile __ TWOWAY_FORCER
+
+#include "Boids.cginc"
+
+static const int ThreadGroupSize = 1024;
+static const float MinDistance = 0.01f;
+
+int BoidsUnitsCount;
+StructuredBuffer<InBoidsUnitData> InputBoidsUnitDatas;
+RWStructuredBuffer<OutBoidsUnitData> OutputBoidsUnitDatas;
+float NeighborRadius;
+float SeperateRadius;
+
+int DirectionalForcersCount;
+StructuredBuffer<InForcerData> InputDirectionalForcerDatas;
+int PointForcersCount;
+StructuredBuffer<InForcerData> InputPointForcerDatas;
+int TwowayForcersCount;
+StructuredBuffer<InForcerData> InputTwowayForcerDatas;
+
+[numthreads(ThreadGroupSize, 1, 1)]
+void Execute(uint3 id : SV_DispatchThreadID)
+{
+    int index = id.x;
+    int i;
+
+    // Weight Processing
+
+    int NeighborCount = 0;
+    float3 PositionSum = 0;
+    float3 DirectionSum = 0;
+    float3 SeperationSum = 0;
+
+    float SqrNeighborRadius = NeighborRadius * NeighborRadius;
+    float SqrSeperateRadius = SeperateRadius * SeperateRadius;
+
+    for (i = 0; i < BoidsUnitsCount; ++i)
+    {
+        if (index != i)
+        {
+            float3 OtherToThis = InputBoidsUnitDatas[index].Position - InputBoidsUnitDatas[i].Position;
+            float SqrDistance = (OtherToThis.x * OtherToThis.x) + (OtherToThis.y * OtherToThis.y) + (OtherToThis.z * OtherToThis.z);
+            SqrDistance = max(MinDistance, SqrDistance);
+
+            if (SqrDistance < SqrNeighborRadius)
+            {
+                NeighborCount += 1;
+                PositionSum += InputBoidsUnitDatas[i].Position;
+                DirectionSum += InputBoidsUnitDatas[i].Direction;
+                
+                if (SqrDistance < SqrSeperateRadius)
+                {
+                    SeperationSum += OtherToThis / SqrDistance;
+                }
+            }
+        }
+    }
+
+    float3 CohesionCenter = PositionSum / NeighborCount;
+    OutputBoidsUnitDatas[index].NeighborCount = NeighborCount;
+    OutputBoidsUnitDatas[index].CohesionVector = CohesionCenter - InputBoidsUnitDatas[index].Position;
+    OutputBoidsUnitDatas[index].AlignmentVector = DirectionSum;
+    OutputBoidsUnitDatas[index].SeperationVector = SeperationSum;
+
+    // Forcer Processing
+
+    float3 ForcerVector = 0;
+
+    #if defined(DIRECTIONAL_FORCER) 
+    for (i = 0; i < DirectionalForcersCount; ++i)
+    {
+        if (Contains(InputBoidsUnitDatas[index].Position, InputDirectionalForcerDatas[i]))
+        {
+            float3 Force = InputDirectionalForcerDatas[i].Direction * InputDirectionalForcerDatas[i].Weight;
+            ForcerVector += Force;
+        } 
+    }
+    #endif
+
+    #if defined(POINT_FORCER)
+    for (i = 0; i < PointForcersCount; ++i)
+    {
+        if (Contains(InputBoidsUnitDatas[index].Position, InputPointForcerDatas[i]))
+        {
+            float3 ForcerToUnitDirection = normalize(InputBoidsUnitDatas[index].Position - InputPointForcerDatas[i].Position);
+            float3 Force = ForcerToUnitDirection * InputPointForcerDatas[i].Weight;
+            ForcerVector += Force;
+        }
+    }
+    #endif
+
+    #if defined(TWOWAY_FORCER)
+	for (i = 0; i < TwowayForcersCount; ++i)
+	{
+		if (Contains(InputBoidsUnitDatas[index].Position, InputTwowayForcerDatas[i]))
+		{
+			float3 ForceDirection = Project(InputBoidsUnitDatas[index].Direction, InputTwowayForcerDatas[i].Direction);
+			float3 Force = ForceDirection * InputTwowayForcerDatas[i].Weight;
+			ForcerVector += Force;
+		}
+	}
+    #endif
+
+    // Apply
+    OutputBoidsUnitDatas[index].ForcerVector = ForcerVector;
+}
