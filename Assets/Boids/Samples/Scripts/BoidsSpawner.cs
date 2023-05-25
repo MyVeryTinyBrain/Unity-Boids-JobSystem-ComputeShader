@@ -11,6 +11,29 @@ namespace Boids.Samples
         public BoidsUnit BoidsUnitPrefab;
         public float Radius = 10;
 
+        int ReservedCreate = 0;
+        int ReservedDestroy = 0;
+        List<BoidsUnit> Units;
+
+        void Awake()
+        {
+            Units = new List<BoidsUnit>();
+        }
+
+        void LateUpdate()
+        {
+            for(int i = 0; i < ReservedCreate; ++i)
+            {
+                CreateNewUnit();
+            }
+            for(int i = 0; i < ReservedDestroy; ++i)
+            {
+                DestroyUnit();
+            }
+            ReservedCreate = 0;
+            ReservedDestroy = 0;
+        }
+
         void OnGUI()
         {
             if (!Application.isPlaying)
@@ -52,29 +75,52 @@ namespace Boids.Samples
             NewUnit.transform.rotation = WorldRotation;
 
             boids.RegistUnit(NewUnit);
+            Units.Add(NewUnit);
+
             return NewUnit;
+        }
+
+        void DestroyUnit()
+        {
+            if (Units.Count > 0)
+            {
+                Destroy(Units[Units.Count - 1].gameObject);
+                Units.RemoveAt(Units.Count - 1);
+            }
         }
 
         void DrawButtons()
         {
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Create 1 Unit", GUILayout.Width(200)))
             {
-                CreateNewUnit();
+                ReservedCreate += 1;
             }
+            if (GUILayout.Button("Destroy 1 Unit", GUILayout.Width(200)))
+            {
+                ReservedDestroy += 1;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Create 10 Units", GUILayout.Width(200)))
             {
-                for (int i = 0; i < 10; ++i)
-                {
-                    CreateNewUnit();
-                }
+                ReservedCreate += 10;
             }
+            if (GUILayout.Button("Destroy 10 Unit", GUILayout.Width(200)))
+            {
+                ReservedDestroy += 10;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Create 100 Units", GUILayout.Width(200)))
             {
-                for (int i = 0; i < 100; ++i)
-                {
-                    CreateNewUnit();
-                }
+                ReservedCreate += 100;
             }
+            if (GUILayout.Button("Destroy 100 Unit", GUILayout.Width(200)))
+            {
+                ReservedDestroy += 100;
+            }
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("CPU", GUILayout.Width(100)))
             {

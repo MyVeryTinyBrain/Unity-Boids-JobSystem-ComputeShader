@@ -7,7 +7,10 @@ namespace Boids
 {
     public class BoidsUnit : BoidsObject
     {
+        public bool AutoUnregist = true;
+
         Vector3 Velocity;
+        Boids CachedBoids;
         Vector3 CachedPosition;
         Vector3 CachedForward;
 
@@ -21,10 +24,19 @@ namespace Boids
 
         public void UpdateBoidsUnit(Boids InBoids, OutBoidsUnitData InData)
         {
+            CachedBoids = InBoids;
             CachedPosition = CachedTransform.position;
             CachedForward = CachedTransform.forward;
             Vector3 Acceleration = CalculateAcceleration(InBoids, InData);
             ApplyAcceleration(InBoids, CachedPosition, Acceleration);
+        }
+
+        void OnDestroy()
+        {
+            if (AutoUnregist && CachedBoids)
+            {
+                CachedBoids.UnregistUnit(this);
+            }
         }
 
         Vector3 CalculateAcceleration(Boids InBoids, OutBoidsUnitData InData)

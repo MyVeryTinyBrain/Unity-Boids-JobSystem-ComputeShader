@@ -561,7 +561,7 @@ GameObject:
   - component: {fileID: 1913823058}
   - component: {fileID: 1913823059}
   m_Layer: 0
-  m_Name: Generator
+  m_Name: Spawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
