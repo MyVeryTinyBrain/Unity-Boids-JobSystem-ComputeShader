@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd75041f93ee74947988e3fd383bb754, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutoUnregist: 1
 --- !u!1 &8812122688896746931
 GameObject:
   m_ObjectHideFlags: 0
@@ -73,11 +74,11 @@ Transform:
   m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 293701054597023338}
+  - {fileID: 3983440489844732567}
   m_Father: {fileID: 5018907899999767593}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &259474783787590017
+--- !u!1001 &3513581182688630140
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -159,11 +160,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: 12265_Fish_v1_L2
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: d56b6dda183e4f34a8ddae86ed79bb85,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5839870858113464067, guid: d56b6dda183e4f34a8ddae86ed79bb85,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -171,9 +167,9 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 3524203cbf2ca8a47b08f1c39878b315, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d56b6dda183e4f34a8ddae86ed79bb85, type: 3}
---- !u!4 &293701054597023338 stripped
+--- !u!4 &3983440489844732567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d56b6dda183e4f34a8ddae86ed79bb85,
     type: 3}
-  m_PrefabInstance: {fileID: 259474783787590017}
+  m_PrefabInstance: {fileID: 3513581182688630140}
   m_PrefabAsset: {fileID: 0}

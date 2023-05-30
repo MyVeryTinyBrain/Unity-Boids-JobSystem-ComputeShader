@@ -971,6 +971,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boids: {fileID: 478286527}
-  BoidsUnitPrefab: {fileID: 5337208196098200874, guid: f0cf0d8d7edeff44c9c3f851bbc41ef2,
+  BoidsUnitPrefab: {fileID: 5337208196098200874, guid: 80997d958d296b24c9b4902f1a20fbf1,
     type: 3}
   Radius: 5
